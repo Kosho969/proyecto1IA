@@ -3,7 +3,7 @@ from PIL import Image, ImageTk
 import numpy as np
 import statistics
 from problem import *
-from search import heuristic1, heuristic2
+from search import graph_search
 import sys
 
 def discretizacion(pixel_block):
@@ -53,7 +53,7 @@ tkimage = ImageTk.PhotoImage(im)
 
 pixel_matrix = np.asarray(im)
 
-blocks = 6
+blocks = 10
 
 segments = round(len(pixel_matrix[0]) / blocks)
 
@@ -160,10 +160,7 @@ pixel_matrix.setflags(write = 1)
 
 problema = Problem(matriz_discreta)
 
-# print(problema.actions(problema.initial()))
-# print(heuristic1(problema, problema.initial()))
-# print(heuristic2(problema, problema.initial()))
-
+# Imprimir imagen discretizada
 for i in range(len(intervals)):
     for p in range(len(intervals)):
         new_color = coloring(matriz_discreta[i][p])
@@ -173,5 +170,36 @@ for i in range(len(intervals)):
 
 im = Image.fromarray(pixel_matrix)
 im.save('your_file.jpg')
+
+# print(problema.actions(problema.initial()))
+# print(heuristic1(problema, problema.initial()))
+# print(heuristic2(problema, problema.initial()))
+
+# TODO: Completar
+# Elegir algoritmo para aplicación de graphsearch, esto podría
+# venir de los argumentos de ejecución del programa
+algorithm = 'a_star'
+heuristic_function = problema.steps_to_reach_goal_heuristic
+
+# TODO: Completar
+# if heuristic_function == 'steps_to_reach_goal_heuristic':
+#     heuristic_function == problema.steps_to_reach_goal_heuristic
+# elif heuristic_function == 'shortest_distance_heuristic':
+#     heuristic_function == problema.shortest_distance_heuristic
+
+result = graph_search(problema, algorithm, heuristic_function)
+
+# TODO: Modificar problem matrix to add result and reprint
+
+if result:
+    print('')
+    print('------------------------------')
+    print('Got a solution path:\n', result)
+    print('------------------------------')
+else:
+    print('')
+    print('------------------------------')
+    print('Got no solution path')
+    print('------------------------------')
 
 root.mainloop()

@@ -1,3 +1,5 @@
+import math
+
 class Problem:
     def __init__ (self, discrete_matrix):
         self.problem_description = discrete_matrix
@@ -20,23 +22,26 @@ class Problem:
         actions = []
         y, x = state
 
-        if (y - 1 > 0):
-            if (self.problem_description[y - 1][x] == '0'):
+        if (y - 1 >= 0):
+            if (self.is_valid_state(self.problem_description[y - 1][x])):
                 actions.append('up')
 
-        if (x - 1 > 0):
-            if (self.problem_description[y][x - 1] == '0'):
+        if (x - 1 >= 0):
+            if (self.is_valid_state(self.problem_description[y][x - 1])):
                 actions.append('left')
 
         if (y + 1 < len(self.problem_description)):
-            if (self.problem_description[y + 1][x] == '0'):
+            if (self.is_valid_state(self.problem_description[y + 1][x])):
                 actions.append('down')
 
         if (x + 1 < len(self.problem_description[0])):
-            if (self.problem_description[y][x + 1] == '0'):
+            if (self.is_valid_state(self.problem_description[y][x + 1])):
                 actions.append('right')
 
         return actions
+
+    def is_valid_state(self, state):
+        return state == '0' or state == 'g'
 
     # A devuelve la tupla (x, y) resultante de aplicar
     # action sobre un estado, es decir sobre una tupla
@@ -72,4 +77,35 @@ class Problem:
         return 1
 
     def path_cost(self, states):
-        return (len(states) -1)
+        return (len(states) - 1)
+
+    # Heuristic shortest distance between two points
+    def shortest_distance_heuristic(self, state):
+        discrete_matrix = self.problem_description
+        final_position = (0, 0)
+
+        for i, x in enumerate(discrete_matrix):
+            if 'g' in x:
+                final_position = (i, x.index('g'))
+                break
+
+        x2, y2 = final_position
+        x1, y1 = state
+
+        distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
+        return distance
+
+    # Heuristic steps to reach goal with no limmitations 
+    def steps_to_reach_goal_heuristic(self, state):
+        discrete_matrix = self.problem_description
+        final_position = (0, 0)
+        for i, x in enumerate(discrete_matrix):
+            if 'g' in x:
+                final_position = (i ,x.index('g'))
+                break
+        x2, y2 = final_position
+        x1, y1 = state
+        total_blocks = abs((y2 - y1) + (x2 - x1))
+
+        return total_blocks

@@ -1,69 +1,71 @@
-import math
 from problem import *
+import sys
 
-# Breadth First Search
-def remove_choice(paths):
-    return min(paths, key = len)
+algorithms = {
+    'bfs': lambda frontier, problem, heuristics_function : min(frontier, key = len),
+    'dfs': lambda frontier, problem, heuristics_function : max(frontier, key = len),
+    'a_star': lambda frontier, problem, heuristics_function: a_star(frontier, problem, heuristics_function)
+}
 
-# Depth First Search 
-def remove_choice2(paths):
-    return max(paths, key = len)
+def remove_choice(frontier, algorithm, problem, heuristics_function = None):
+    selected_path = algorithms[algorithm](frontier, problem, heuristics_function)
 
-# A*
-def remove_choice3(paths):
-    pass
+    if (selected_path in frontier):
+        frontier.remove(selected_path)
 
-# Heuristic shortest distance between two points
-def heuristic1(problem, state):
-    discrete_matrix = problem.problem_description
-    final_position = (0, 0)
+    return selected_path
 
-    for i, x in enumerate(discrete_matrix):
-        if 'g' in x:
-            final_position = (i, x.index('g'))
-            break
+def a_star(frontier, problem, heuristics_function):
+    f_list = [
+        (problem.path_cost(path) + heuristics_function(path[-1]), path)
+        for path in frontier
+    ]
 
-    x2, y2 = final_position
-    x1, y1 = state
+    # Returnar el segundo elemento de la tupla denotada por el menor valor
+    # en el primer elemento
+    return min(f_list, key = lambda tuple : tuple[0])[1]
 
-    distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-
-    return distance
-
-# Heuristic, steps to reach goal with no limmitations 
-def heuristic2(problem, state):
-    discrete_matrix = problem.problem_description
-    final_position = (0, 0)
-    for i, x in enumerate(discrete_matrix):
-        if 'g' in x:
-            final_position = (i ,x.index('g'))
-            break
-    x2, y2 = final_position
-    x1, y1 = state
-    total_blocks = abs((y2 - y1) + (x2 - x1))
-
-    return total_blocks
-
-def graph_search(problem):
-    frontier = [[problem.initial]]
+def graph_search(problem, algorithm, heuristics_function = None):
+    frontier = [[problem.initial()]]
     explored = set([])
+    currentIterationIndex = 0
+    maxIterations = None
+    debug = True
 
     while True:
         if len(frontier):
-            path = remove_choice(frontier)
-            s = path[-1]
-            explored.add(s)
+            debug and print('---- Iteración ' + str(currentIterationIndex))
+            debug and debug_print_frontier(frontier)
 
-            if problem.goal_test(s):
-                return path
+            chosen_path = remove_choice(frontier, algorithm, problem, heuristics_function)
 
-            for a in problem.actions(s):
-                result = problem.result(s, a)
+            debug and print('Chosen path:\n ', chosen_path)
+
+            end_of_path = chosen_path[-1]
+            explored.add(end_of_path)
+
+            if (maxIterations and currentIterationIndex == maxIterations):
+                debug and print('Force quitting')
+                sys.exit()
+
+            if problem.goal_test(end_of_path):
+                return chosen_path
+
+            for action in problem.actions(end_of_path):
+                result = problem.result(end_of_path, action)
 
                 if result not in explored:
                     new_path = []
-                    new_path.extend( path )
-                    new_path.append( problem.result(s, a) )
+                    new_path.extend(chosen_path)
+                    new_path.append(problem.result(end_of_path, action))
                     frontier.append(new_path)
+
+            currentIterationIndex += 1
         else:
             return False
+
+def debug_print_frontier(frontier):
+    print('Current frontier\n[')
+    for path in frontier:
+        print('  ' + str(path))
+    print(']')
