@@ -1,12 +1,14 @@
 import math
 
+# Inicio Framework del problema.
 class Problem:
     def __init__ (self, discrete_matrix):
         self.problem_description = discrete_matrix
-        # TODO: Verificar que que la matriz discreta tenga un inicio,
-        # de lo contrario gracefully avisar
+        self.goals = self.goal_()
         if (not self.initial()):
+            print(self.initial())
             raise ValueError('No se encontró estado inicial en la discretización')
+        print(self.initial())
 
     # Devuelve la tupla (x, y) del punto de partida rojo, identificado
     # como 's' en los colores de problem_description
@@ -65,47 +67,53 @@ class Problem:
             x = x + 1
             return (y, x)
 
+    # Verificamos que haya una meta
     def goal_test(self, state):
         y, x = state
-
         if (self.problem_description[y][x] == 'g'):
             return True
-
         return False
 
+    # Costo de dar un paso en nuestra matriz
     def step_cost(self, state, action, state_1):
         return 1
 
+    # Costo de uno de los caminos
     def path_cost(self, states):
         return (len(states) - 1)
+
+# FIN Framework
+
+    # Obtener arreglo con las metas 
+    def goal_(self):
+        initial_position = (0, 0)
+        goals = []
+        for i, x in enumerate(self.problem_description):
+            if 'g' in x:
+                goals.append((i, x.index('g')))
+        return goals
 
     # Heuristic shortest distance between two points
     def shortest_distance_heuristic(self, state):
         discrete_matrix = self.problem_description
-        final_position = (0, 0)
-
-        for i, x in enumerate(discrete_matrix):
-            if 'g' in x:
-                final_position = (i, x.index('g'))
-                break
-
-        x2, y2 = final_position
-        x1, y1 = state
-
-        distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-
-        return distance
+        distances = []
+        for goal in self.goals:
+            final_position = goal
+            x2, y2 = final_position
+            x1, y1 = state
+            distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+            distances.append(distance)
+        return min(distances)
 
     # Heuristic steps to reach goal with no limmitations 
     def steps_to_reach_goal_heuristic(self, state):
         discrete_matrix = self.problem_description
-        final_position = (0, 0)
-        for i, x in enumerate(discrete_matrix):
-            if 'g' in x:
-                final_position = (i ,x.index('g'))
-                break
-        x2, y2 = final_position
-        x1, y1 = state
-        total_blocks = abs((y2 - y1) + (x2 - x1))
+        steps = []
+        for goal in self.goals:
+            final_position = goal
+            x2, y2 = final_position
+            x1, y1 = state
+            total_blocks = abs((y2 - y1) + (x2 - x1))
+            steps.append(total_blocks)
 
-        return total_blocks
+        return min(steps)

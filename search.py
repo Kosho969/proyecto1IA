@@ -1,3 +1,5 @@
+
+
 from problem import *
 import sys
 
@@ -23,6 +25,7 @@ def a_star(frontier, problem, heuristics_function):
 
     # Returnar el segundo elemento de la tupla denotada por el menor valor
     # en el primer elemento
+    #print(f_list)
     return min(f_list, key = lambda tuple : tuple[0])[1]
 
 def graph_search(problem, algorithm, heuristics_function = None):
@@ -30,12 +33,13 @@ def graph_search(problem, algorithm, heuristics_function = None):
     explored = set([])
     currentIterationIndex = 0
     maxIterations = None
-    debug = True
+    debug = False
 
     while True:
         if len(frontier):
             debug and print('---- Iteración ' + str(currentIterationIndex))
             debug and debug_print_frontier(frontier)
+            debug and debug_print_frontier(explored)
 
             chosen_path = remove_choice(frontier, algorithm, problem, heuristics_function)
 

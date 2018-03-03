@@ -1,3 +1,9 @@
+# Author: Pablo Barreno Koch 
+# Main program 
+# To run use 'py filename algorithm heuristic'
+# i.e (py prueba.py bfs 1)
+
+
 from tkinter import Label, Tk, filedialog
 from PIL import Image, ImageTk
 import numpy as np
@@ -11,9 +17,6 @@ def discretizacion(pixel_block):
     green_average = [pixel_block[p][1] for p in range (len(pixel_block))]
     blue_average = [pixel_block[p][2] for p in range (len(pixel_block))]
 
-    # print("Rojo: ", red_average)
-    # print("Verde: ", green_average)
-    # print("Azul: ", blue_average)
     return [
         np.average(red_average),
         np.average(green_average),
@@ -32,15 +35,18 @@ def coloring(element):
 
     elif element == 's':
         return np.array([255, 0, 0])
+    elif element == 'p':
+        return np.array([148, 0, 211])
 
     else:
         return np.array([255, 255, 255])
 
 root = Tk()
 
-# TODO: Uncomment
-# path = filedialog.askopenfilename(filetypes = [('Image File', '.jpg')])
-path = 'C:\\Users\\Pablo\\Pictures\\input.jpg'
+print(str(sys.argv[1]))
+print(str(sys.argv[2]))
+
+path = filedialog.askopenfilename(filetypes = [('Image File', '.jpg'), ('bitmap', '.bmp')])
 
 im = Image.open(path)
 
@@ -53,7 +59,7 @@ tkimage = ImageTk.PhotoImage(im)
 
 pixel_matrix = np.asarray(im)
 
-blocks = 10
+blocks = 15
 
 segments = round(len(pixel_matrix[0]) / blocks)
 
@@ -71,17 +77,17 @@ intervals.append(
     )
 )
 
-# if (pixel_matrix.shape[0] >= intervals[i][1])
-#     and (pixel_matrix.shape[1] >= intervals[i][1])
-#     and pixel_matrix.shape[0] >= intervals[i][0]
-#     and pixel_matrix.shape[1] >= intervals[i][0]
-
 # Matriz de bloques a partir de la imágen original
 colores_rgb = [
     [
         pixel_matrix[j][p]
         for j in range(intervals[i][0], intervals[i][1])
         for p in range(intervals[z][0], intervals[z][1])
+# Uncomment for non-square images
+# if (pixel_matrix.shape[0] >= intervals[i][1])
+#     and (pixel_matrix.shape[1] >= intervals[i][1])
+#     and pixel_matrix.shape[0] >= intervals[i][0]
+#     and pixel_matrix.shape[1] >= intervals[i][0]
     ]
     for i in range(len(intervals))
     for z in range(len(intervals))
@@ -112,9 +118,9 @@ for i in range(len(colores_rgb)):
         if contador_j < len(matriz_discreta[0]):
             if (
                 (
-                    color[0] == color[1]
-                        and color[0] == color[2]
-                        and color[1] == color[2]
+                    round(color[0]) == round(color[1])
+                        and round(color[0]) == round(color[2])
+                        and round(color[1]) == round(color[2])
                 )
                     and (
                         color[0] < 100
@@ -125,7 +131,19 @@ for i in range(len(colores_rgb)):
                 # Negro
                 matriz_discreta[contador_x][contador_j] = "+"
 
-            elif ((color[0] == color[1] and color[0] == color[2] and color[1] == color[2]) and (color[0] > 100 and color[1] > 100 and color[2] > 100)):
+            elif (
+                    (
+                       round(color[0]) == round(color[1])
+                        and round(color[0]) == round(color[2])
+                        and round(color[1]) == round(color[2])
+                    )
+                        and 
+                        (
+                            color[0] > 100 
+                            and color[1] > 100 
+                            and color[2] > 100
+                    )
+                ):
                 # Blanco
                 matriz_discreta[contador_x][contador_j] = "0"
 
@@ -138,8 +156,9 @@ for i in range(len(colores_rgb)):
                 matriz_discreta[contador_x][contador_j] = "0"
 
             else:
-                if (color[0] >= color[1]) and  (color[0] >= color[2]):
+                if (color[0] >= color[1]) and  (color[0] >= color[2] ):
                     # Rojo
+                    print(color)
                     matriz_discreta[contador_x][contador_j] = "s"
 
                 elif (color[1] >= color[0] and color[1] >= color[2]):
@@ -159,6 +178,8 @@ for i in range(len(colores_rgb)):
 pixel_matrix.setflags(write = 1)
 
 problema = Problem(matriz_discreta)
+for j in range(len(matriz_discreta)):
+    print(matriz_discreta[j])
 
 # Imprimir imagen discretizada
 for i in range(len(intervals)):
@@ -171,31 +192,40 @@ for i in range(len(intervals)):
 im = Image.fromarray(pixel_matrix)
 im.save('your_file.jpg')
 
-# print(problema.actions(problema.initial()))
-# print(heuristic1(problema, problema.initial()))
-# print(heuristic2(problema, problema.initial()))
 
-# TODO: Completar
-# Elegir algoritmo para aplicación de graphsearch, esto podría
-# venir de los argumentos de ejecución del programa
-algorithm = 'a_star'
+# Correr algoritmo de busqueda para las soluciones. 
+algorithm = str(sys.argv[1])
+option = str(sys.argv[2])
 heuristic_function = problema.steps_to_reach_goal_heuristic
 
-# TODO: Completar
-# if heuristic_function == 'steps_to_reach_goal_heuristic':
-#     heuristic_function == problema.steps_to_reach_goal_heuristic
-# elif heuristic_function == 'shortest_distance_heuristic':
-#     heuristic_function == problema.shortest_distance_heuristic
+if option == '1':
+    heuristic_function = problema.steps_to_reach_goal_heuristic
+elif option == '2':
+    heuristic_function = problema.shortest_distance_heuristic
 
 result = graph_search(problema, algorithm, heuristic_function)
 
-# TODO: Modificar problem matrix to add result and reprint
 
 if result:
+# Si hay resultado entonces mostrar la imegn resultante, de lo contrario no mostrar solucion
     print('')
     print('------------------------------')
     print('Got a solution path:\n', result)
     print('------------------------------')
+
+    for i in range(len(result)):
+        matriz_discreta[result[i][0]][result[i][1]] = 'p'
+
+    # Imprimir imagen discretizada
+    for i in range(len(intervals)):
+        for p in range(len(intervals)):
+            new_color = coloring(matriz_discreta[i][p])
+            for j in range(intervals[i][0],intervals[i][1]):
+                for z in range(intervals[p][0],intervals[p][1]):
+                    pixel_matrix[j][z] = new_color
+
+    im = Image.fromarray(pixel_matrix)
+    im.save('result.jpg')
 else:
     print('')
     print('------------------------------')
