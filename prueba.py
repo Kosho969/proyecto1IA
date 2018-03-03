@@ -4,7 +4,7 @@
 # i.e (py prueba.py bfs 1)
 
 
-from tkinter import Label, Tk, filedialog
+from tkinter import Label, Tk, filedialog, Toplevel, Canvas, BOTH, NW
 from PIL import Image, ImageTk
 import numpy as np
 import statistics
@@ -53,9 +53,9 @@ im = Image.open(path)
 tkimage = ImageTk.PhotoImage(im)
 
 # TODO: Remove if unused
-# myvar = Label(root, image = tkimage)
-# myvar.image = tkimage
-# myvar.pack()
+myvar = Label(root, image = tkimage)
+myvar.image = tkimage
+myvar.pack()
 
 pixel_matrix = np.asarray(im)
 
@@ -226,6 +226,13 @@ if result:
 
     im = Image.fromarray(pixel_matrix)
     im.save('result.jpg')
+    tkimage2 = ImageTk.PhotoImage(im)
+    top = Toplevel()
+    top.title('Optimized Map')
+    top.wm_geometry("794x370")
+    optimized_canvas = Canvas(top)
+    optimized_canvas.pack(fill=BOTH, expand=1)
+    optimized_image = optimized_canvas.create_image(0, 0, anchor=NW, image=tkimage2)
 else:
     print('')
     print('------------------------------')
