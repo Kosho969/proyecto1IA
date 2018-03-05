@@ -9,6 +9,8 @@ algorithms = {
     'a_star': lambda frontier, problem, heuristics_function: a_star(frontier, problem, heuristics_function)
 }
 
+
+# Quitamos el camino de la frontera conforme al criterio del algoritmo implementado. 
 def remove_choice(frontier, algorithm, problem, heuristics_function = None):
     selected_path = algorithms[algorithm](frontier, problem, heuristics_function)
 

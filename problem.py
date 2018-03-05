@@ -95,6 +95,8 @@ class Problem:
 
     # Heuristic shortest distance between two points
     def shortest_distance_heuristic(self, state):
+        if len(self.goals) == 0:
+            return 0
         discrete_matrix = self.problem_description
         distances = []
         for goal in self.goals:
@@ -107,6 +109,8 @@ class Problem:
 
     # Heuristic steps to reach goal with no limmitations 
     def steps_to_reach_goal_heuristic(self, state):
+        if len(self.goals) == 0:
+            return 0
         discrete_matrix = self.problem_description
         steps = []
         for goal in self.goals:

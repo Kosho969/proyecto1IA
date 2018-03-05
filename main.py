@@ -41,34 +41,34 @@ def coloring(element):
     else:
         return np.array([255, 255, 255])
 
-root = Tk()
+blocks = 10
 
+# Segmento para escoger imagen
+root = Tk()
 print(str(sys.argv[1]))
 print(str(sys.argv[2]))
-
 path = filedialog.askopenfilename(filetypes = [('Image File', '.jpg'), ('bitmap', '.bmp')])
-
 im = Image.open(path)
-
 tkimage = ImageTk.PhotoImage(im)
-
 # TODO: Remove if unused
 myvar = Label(root, image = tkimage)
 myvar.image = tkimage
 myvar.pack()
 
-pixel_matrix = np.asarray(im)
 
-blocks = 15
+# Separar en un arreglo la imagen 
+pixel_matrix = np.asarray(im)
 
 segments = round(len(pixel_matrix[0]) / blocks)
 
+# Calculo de intervalos para la discretizacion 
 intervals = [
     (p, p + segments)
     for p in range(0, len(pixel_matrix[0]), segments)
     if (p + segments) < len(pixel_matrix[0])
 ]
 
+# Calcular el ultimo segmento de intervalo. s
 intervals.append(
     (
         intervals[-1][1],
@@ -163,7 +163,7 @@ for i in range(len(colores_rgb)):
 
                 elif (color[1] >= color[0] and color[1] >= color[2]):
                     # Verde
-                    matriz_discreta[contador_x][contador_j] = "g"
+                    matriz_discreta[contador_x][contador_j] = "+"
 
                 else:
                     # Blanco
@@ -177,7 +177,10 @@ for i in range(len(colores_rgb)):
 
 pixel_matrix.setflags(write = 1)
 
+# Llamada al frameqork de problema 
 problema = Problem(matriz_discreta)
+
+# Impresion solo para mostrar progreso y representacion discreta
 for j in range(len(matriz_discreta)):
     print(matriz_discreta[j])
 
@@ -190,7 +193,7 @@ for i in range(len(intervals)):
                 pixel_matrix[j][z] = new_color
 
 im = Image.fromarray(pixel_matrix)
-im.save('your_file.jpg')
+im.save('discrete_image.jpg')
 
 
 # Correr algoritmo de busqueda para las soluciones. 
