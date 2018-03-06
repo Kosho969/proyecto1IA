@@ -11,6 +11,7 @@ import statistics
 from problem import *
 from search import graph_search
 import sys
+import time
 
 def discretizacion(pixel_block):
     red_average = [pixel_block[p][0] for p in range (len(pixel_block))]
@@ -41,7 +42,7 @@ def coloring(element):
     else:
         return np.array([255, 255, 255])
 
-blocks = 10
+blocks = 15
 
 # Segmento para escoger imagen
 root = Tk()
@@ -163,7 +164,7 @@ for i in range(len(colores_rgb)):
 
                 elif (color[1] >= color[0] and color[1] >= color[2]):
                     # Verde
-                    matriz_discreta[contador_x][contador_j] = "+"
+                    matriz_discreta[contador_x][contador_j] = "g"
 
                 else:
                     # Blanco
@@ -192,9 +193,9 @@ for i in range(len(intervals)):
             for z in range(intervals[p][0],intervals[p][1]):
                 pixel_matrix[j][z] = new_color
 
+
 im = Image.fromarray(pixel_matrix)
 im.save('discrete_image.jpg')
-
 
 # Correr algoritmo de busqueda para las soluciones. 
 algorithm = str(sys.argv[1])
@@ -206,8 +207,11 @@ if option == '1':
 elif option == '2':
     heuristic_function = problema.shortest_distance_heuristic
 
+t1 = time.time()
 result = graph_search(problema, algorithm, heuristic_function)
+t2 = time.time()
 
+print("time: ", str(t2-t1))
 
 if result:
 # Si hay resultado entonces mostrar la imegn resultante, de lo contrario no mostrar solucion

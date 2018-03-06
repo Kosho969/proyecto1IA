@@ -2,6 +2,7 @@
 
 from problem import *
 import sys
+import time
 
 algorithms = {
     'bfs': lambda frontier, problem, heuristics_function : min(frontier, key = len),
@@ -35,7 +36,7 @@ def graph_search(problem, algorithm, heuristics_function = None):
     explored = set([])
     currentIterationIndex = 0
     maxIterations = None
-    debug = False
+    debug = True
 
     while True:
         if len(frontier):
@@ -43,8 +44,11 @@ def graph_search(problem, algorithm, heuristics_function = None):
             debug and debug_print_frontier(frontier)
             debug and debug_print_frontier(explored)
 
+            #t1 = time.time()
             chosen_path = remove_choice(frontier, algorithm, problem, heuristics_function)
+            #t2 = time.time()
 
+            #print("time: ", str(t2-t1))
             debug and print('Chosen path:\n ', chosen_path)
 
             end_of_path = chosen_path[-1]
